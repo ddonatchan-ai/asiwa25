@@ -1,0 +1,278 @@
+ <!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donat Chan Pro</title>
+
+<style>
+body{
+    font-family: 'Segoe UI', sans-serif;
+    margin:0;
+    background:#f5f5f5;
+}
+
+/* HEADER */
+header{
+    background:linear-gradient(45deg,#ff6b6b,#ff9a9e);
+    color:white;
+    padding:20px;
+    text-align:center;
+    font-size:26px;
+    font-weight:bold;
+    animation: floatText 3s ease-in-out infinite;
+}
+
+/* ANIMASI HEADER */
+@keyframes floatText {
+    0%{transform:translateY(0)}
+    50%{transform:translateY(-5px)}
+    100%{transform:translateY(0)}
+}
+
+/* LAYOUT */
+.wrapper{
+    display:flex;
+    flex-wrap:wrap;
+}
+
+/* PRODUK */
+.products{
+    flex:2;
+    padding:20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px) scale(1.03);
+}
+
+/* GAMBAR PRODUK */
+.card img{
+    width:100%;
+    aspect-ratio:1/1; /* RASIO FIX */
+    object-fit:cover;
+    transition:0.3s;
+}
+
+.card:hover img{
+    transform:scale(1.1); /* ZOOM EFFECT */
+}
+
+.card-body{
+    padding:12px;
+}
+
+.card-body h4{
+    margin:5px 0;
+}
+
+button{
+    background:#ff6b6b;
+    border:none;
+    color:white;
+    padding:10px;
+    width:100%;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    background:#ff4b4b;
+}
+
+/* CART */
+.cart{
+    flex:1;
+    background:white;
+    padding:20px;
+    min-width:280px;
+    box-shadow:-2px 0 5px rgba(0,0,0,0.1);
+}
+
+.cart h2{
+    margin-top:0;
+}
+
+.cart-item{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:10px;
+}
+
+.qty{
+    display:flex;
+    gap:5px;
+}
+
+.qty button{
+    width:25px;
+    padding:2px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border-radius:6px;
+    border:1px solid #ddd;
+}
+</style>
+</head>
+
+<body>
+
+<header>🍩 Donat Chan</header>
+
+<div class="wrapper">
+
+<!-- PRODUK -->
+<div class="products">
+
+<div class="card">
+<img src="c:\Users\Hype GLK\Pictures\donat coklat 1.jpg" alt="Donat Coklat">
+<div class="card-body">
+<h4>Donat Coklat</h4>
+<p>Rp10.000</p>
+<button onclick="addToCart('Donat Coklat',10000)">+ Tambah</button>
+</div>
+</div>
+
+<div class="card">
+<img src="c:\Users\Hype GLK\Downloads\donat pink.avif" alt="Donat Strawberry">
+<div class="card-body">
+<h4>Donat Strawberry</h4>
+<p>Rp12.000</p>
+<button onclick="addToCart('Donat Strawberry',12000)">+ Tambah</button>
+</div> 
+</div>
+
+<div class="card">
+<img src="c:\Users\Hype GLK\Downloads\donat gula.jpeg" alt="Donat Gula">
+<div class="card-body">
+<h4>Donat Gula</h4>
+<p>Rp8.000</p>
+<button onclick="addToCart('Donat Gula',8000)">+ Tambah</button>
+</div>
+</div>
+
+</div>
+
+<!-- KERANJANG -->
+<div class="cart">
+<h2>🛒 Keranjang</h2>
+
+<div id="cartList"></div>
+
+<p><b>Total: Rp <span id="total">0</span></b></p>
+
+<h3>Checkout</h3>
+<input type="text" id="nama" placeholder="Nama">
+<input type="text" id="alamat" placeholder="Alamat">
+
+<button onclick="checkout()">Pesan via WhatsApp</button>
+</div>
+
+</div>
+
+<script>
+let cart = [];
+
+function addToCart(nama, harga){
+    let item = cart.find(i => i.nama === nama);
+
+    if(item){
+        item.qty++;
+    }else{
+        cart.push({nama, harga, qty:1});
+    }
+
+    renderCart();
+}
+
+function renderCart(){
+    let list = document.getElementById("cartList");
+    let totalEl = document.getElementById("total");
+
+    list.innerHTML = "";
+    let total = 0;
+
+    cart.forEach((item, index)=>{
+        total += item.harga * item.qty;
+
+        list.innerHTML += `
+        <div class="cart-item">
+            <div>
+                ${item.nama}<br>
+                Rp${formatRupiah(item.harga)}
+            </div>
+            <div class="qty">
+                <button onclick="kurang(${index})">-</button>
+                ${item.qty}
+                <button onclick="tambah(${index})">+</button>
+            </div>
+        </div>`;
+    });
+
+    totalEl.innerText = formatRupiah(total);
+}
+
+function tambah(i){
+    cart[i].qty++;
+    renderCart();
+}
+
+function kurang(i){
+    cart[i].qty--;
+    if(cart[i].qty <= 0) cart.splice(i,1);
+    renderCart();
+}
+
+function formatRupiah(angka){
+    return angka.toLocaleString("id-ID");
+}
+
+function checkout(){
+    if(cart.length === 0){
+        alert("Keranjang kosong!");
+        return;
+    }
+
+    const nama = document.getElementById("nama").value;
+    const alamat = document.getElementById("alamat").value;
+
+    if(nama === "" || alamat === ""){
+        alert("Isi data dulu!");
+        return;
+    }
+
+    let total = 0;
+    let struk = "🧾 Donat Chan\n\n";
+    struk += "Nama: " + nama + "\n";
+    struk += "Alamat: " + alamat + "\n\n";
+
+    cart.forEach(item=>{
+        total += item.harga * item.qty;
+        struk += `${item.nama} x${item.qty} - Rp${formatRupiah(item.harga * item.qty)}\n`;
+    });
+
+    struk += "\nTotal: Rp" + formatRupiah(total);
+
+    let wa = `https://wa.me/6281241500722?text=${encodeURIComponent(struk)}`;
+    window.open(wa, "_blank");
+}
+</script>
+
+</body>
+</html>
